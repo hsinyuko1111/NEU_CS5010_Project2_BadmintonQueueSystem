@@ -29,7 +29,7 @@ function FirestoreDB() {
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
 
-  firestoreDB.getUsers = async () => {
+  async function getUsers() {
     //const auth = getAuth(app);
     const usersSnapshot = await getDocs(collection(db, "users"));
     const usersList = usersSnapshot.docs.map((doc) => ({
@@ -41,9 +41,49 @@ function FirestoreDB() {
     return usersList;
   };
 
+  async function verifyUser(email, password) {
+    try {
+      const q = query(collection(db, "users"), where("email", "==", email));
+      const querySnapshot = await getDocs(q);
+  
+      if (querySnapshot.empty) {
+        return { success: false, error: "User not found." };
+      }
+  
+      const userDoc = querySnapshot.docs[0];
+      const userData = userDoc.data();
+  
+      // Check password
+      if (userData.password !== password) {
+        return { success: false, error: "Incorrect password." };
+      }
+  
+      // ✅ Return user ID and data
+      return { success: true, user: { id: userDoc.id, ...userData } };
+    } catch (error) {
+      console.error("Login error:", error);
+      return { success: false, error: "Login failed. Please try again." };
+    }
+  };
+
+  async function checkInUser(userId) {
+    try {
+      const userRef = doc(db, "users", userId);
+      await updateDoc(userRef, { checkedIn: true });
+      return { success: true };
+    } catch (error) {
+      console.error("Check-in error:", error);
+      return { success: false, error: "Check-in failed." };
+    }
+  };
+
+  firestoreDB.getUsers = getUsers;
+  firestoreDB.verifyUser = verifyUser;
+  firestoreDB.checkInUser = checkInUser;
+
   return firestoreDB;
 }
-
 const firestoreDB = FirestoreDB();
+
 
 export default firestoreDB;
