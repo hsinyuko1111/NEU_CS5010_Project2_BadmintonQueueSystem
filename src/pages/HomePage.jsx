@@ -13,7 +13,11 @@ export default function HomePage() {
 
   return (
     <BaseTemplate>
-      {/* <div className="HomePage">
+      {
+        <div >
+          <h1>You are little 🥬🐥</h1>
+        </div>
+        /* <div className="HomePage">
         <div>Projects</div>
         <ProjectsList projectsPromise={projectsPromise} />
       </div> */}

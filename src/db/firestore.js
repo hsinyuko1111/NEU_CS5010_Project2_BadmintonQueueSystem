@@ -77,9 +77,28 @@ function FirestoreDB() {
     }
   };
 
+  async function registerUser(name, email, password) {
+    try {
+      const userRef = await addDoc(collection(db, "users"), {
+        name,
+        email,
+        password, // Note: Consider hashing passwords for security
+        checkedIn: false,
+      });
+  
+      return { success: true, userId: userRef.id };
+    } catch (error) {
+      console.error("Registration error:", error);
+      return { success: false, error: "Registration failed. Please try again." };
+    }
+  }
+
+  
+
   firestoreDB.getUsers = getUsers;
   firestoreDB.verifyUser = verifyUser;
   firestoreDB.checkInUser = checkInUser;
+  firestoreDB.registerUser = registerUser;
 
   return firestoreDB;
 }
