@@ -11,7 +11,7 @@ export default function RegisterPage() {
   });
   const [error, setError] = useState("");
   const [successMessage, setSuccessMessage] = useState(""); // ✅ Store success message
-  const [userId, setUserId] = useState(null); // ✅ Store user ID after registration
+  const [_, setUserId] = useState(null); // ✅ Store user ID after registration
 
   const handleChange = (e) => {
     const { name, value } = e.target;

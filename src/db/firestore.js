@@ -5,6 +5,7 @@ import {
   collection,
   addDoc,
   getDocs,
+  deleteDoc,
   query,
   where,
   updateDoc,
@@ -93,12 +94,28 @@ function FirestoreDB() {
     }
   }
 
-  
+  async function deleteUser(userId) {
+    await deleteDoc(doc(db, "users", userId));
+  }
+
+
+  async function checkOutUser(userId) {
+    try {
+      const userRef = doc(db, "users", userId);
+      await updateDoc(userRef, { checkedIn: false });
+      return { success: true };
+    } catch (error) {
+      console.error("Check-out error:", error);
+      return { success: false, error: "Check-out failed." };
+    }
+  }
 
   firestoreDB.getUsers = getUsers;
   firestoreDB.verifyUser = verifyUser;
   firestoreDB.checkInUser = checkInUser;
   firestoreDB.registerUser = registerUser;
+  firestoreDB.deleteUser = deleteUser;
+  firestoreDB.checkOutUser =checkOutUser;
 
   return firestoreDB;
 }
