@@ -1,0 +1,132 @@
+/* Container */
+.container {
+  display: flex;
+  gap: 20px;
+  padding: 20px;
+}
+
+/* User List */
+.user-list {
+  flex: 1;
+  border: 1px solid black;
+  padding: 10px;
+}
+
+.user-item {
+  cursor: pointer;
+  padding: 5px;
+  margin-bottom: 5px;
+  background-color: #f0f0f0;
+  border: 1px solid #ccc;
+  text-align: center;
+}
+
+.user-item.selected-user {
+  background-color: #ffcccb;
+}
+
+/* Slot Grid */
+.slot-grid {
+  flex: 2;
+  border: 1px solid black;
+  padding: 10px;
+}
+
+.row-container {
+  margin-bottom: 20px;
+}
+
+.slot-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  margin-bottom: 10px;
+  padding: 10px;
+  border-radius: 5px;
+}
+
+.slot-row.started {
+  background-color: #ffeb3b;
+}
+
+.slot-row.ended {
+  background-color: #bdbdbd;
+}
+
+.slot {
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #eee;
+  border: 1px solid #999;
+}
+
+.slot.filled {
+  background-color: #add8e6;
+}
+
+.slot.clickable {
+  cursor: pointer;
+}
+
+/* Buttons */
+.add-button {
+  width: 100%;
+  padding: 5px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  cursor: pointer;
+  margin-bottom: 10px;
+}
+
+.timer-display {
+  text-align: center;
+}
+
+.start-button {
+  width: 100%;
+  padding: 5px;
+  background-color: #f39c12;
+  color: white;
+  border: none;
+  cursor: pointer;
+  margin-bottom: 10px;
+}
+
+.restart-button {
+  width: 100%;
+  padding: 5px;
+  background-color: #3498db;
+  color: white;
+  border: none;
+  cursor: pointer;
+  margin-bottom: 10px;
+}
+
+.end-button {
+  width: 100%;
+  padding: 5px;
+  background-color: #c0392b;
+  color: white;
+  border: none;
+  cursor: pointer;
+  margin-bottom: 10px;
+}
+
+.add-row-button {
+  width: 100%;
+  padding: 5px;
+  background-color: #28a745;
+  color: white;
+  border: none;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+.bg-image {
+  background-image: url("https://mdbcdn.b-cdn.net/img/Photos/new-templates/search-box/img4.webp");
+  background-size: cover;
+  background-position: center;
+}
