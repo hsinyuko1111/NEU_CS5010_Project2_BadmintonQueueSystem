@@ -3,7 +3,6 @@ import { createRoot } from "react-dom/client";
 import "mdb-ui-kit/css/mdb.min.css";
 import "./index.css";
 import HomePage from "./pages/HomePage.jsx";
-import AboutPage from "./pages/AboutPage.jsx";
 import TimerModePage from "./pages/TimerModePage.jsx";
 import MatchModePage from "./pages/MatchModePage.jsx";
 import LoginPage from "./pages/LoginPage.jsx";
@@ -17,7 +16,6 @@ createRoot(document.getElementById("root")).render(
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<HomePage />} />
-        <Route path="/about" element={<AboutPage />} />
         <Route path="/timer-mode" element={<TimerModePage />} />
         <Route path="/match-mode" element={<MatchModePage />} />
         <Route path="/login" element={<LoginPage />} />
