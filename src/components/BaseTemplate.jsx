@@ -2,7 +2,6 @@ import Container from "react-bootstrap/Container";
 import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
 import NavDropdown from "react-bootstrap/NavDropdown";
-import { NavLink, Link } from "react-router";
 
 export default function BaseTemplate({ children }) {
   return (
@@ -31,6 +30,7 @@ function NavBar() {
             <NavDropdown title="Admin" id="basic-nav-dropdown">
               <NavDropdown.Item href="/admin/delete">Delete User</NavDropdown.Item>
               <NavDropdown.Item href="/admin/checkout">Checkout User</NavDropdown.Item>
+              <NavDropdown.Item href="/admin/reset">Reset Game</NavDropdown.Item>
             </NavDropdown>
           </Nav>
         </Navbar.Collapse>

@@ -1,42 +1,41 @@
 import React, { useState, useEffect } from "react";
-import firestoreDB from "../db/fireStore"; // Firestore functions
+import firestoreDB from "../db/fireStore"; 
 import BaseTemplate from "../components/BaseTemplate";
-import "../assets/style/Admin.css"; // ✅ Import the CSS file
+import "../assets/style/Admin.css"; 
 
 export default function AdminCheckoutPage() {
   const [users, setUsers] = useState([]);
   const [passcode, setPasscode] = useState("");
   const [isAuthorized, setIsAuthorized] = useState(false);
-  const correctPasscode = "1234"; // Change this to your admin passcode
+  const correctPasscode = "1234"; 
 
   useEffect(() => {
-    // Check if session storage has the correct passcode
     if (sessionStorage.getItem("adminPasscode") === correctPasscode) {
       setIsAuthorized(true);
       fetchCheckedInUsers();
-      startAutoLogout(); // ✅ Start auto logout countdown
+      startAutoLogout(); 
     }
   }, []);
 
   const fetchCheckedInUsers = async () => {
     const allUsers = await firestoreDB.getUsers();
-    const checkedInUsers = allUsers.filter(user => user.checkedIn); // ✅ Only checked-in users
+    const checkedInUsers = allUsers.filter(user => user.checkedIn); 
     setUsers(checkedInUsers);
   };
 
   const handlePasscodeSubmit = () => {
     if (passcode === correctPasscode) {
       setIsAuthorized(true);
-      sessionStorage.setItem("adminPasscode", correctPasscode); // ✅ Store in session storage
+      sessionStorage.setItem("adminPasscode", correctPasscode); 
       fetchCheckedInUsers();
     } else {
       alert("❌ Incorrect passcode!");
     }
   };
   const handleAdminLogout = () => {
-    sessionStorage.removeItem("adminPasscode"); // ✅ Remove passcode from session
-    setIsAuthorized(false); // ✅ Force re-entry of passcode
-    setPasscode(""); // Clear input
+    sessionStorage.removeItem("adminPasscode"); 
+    setIsAuthorized(false); 
+    setPasscode(""); 
   };
 
   // ✅ Auto Logout After Inactivity (5 minutes)
@@ -44,7 +43,7 @@ export default function AdminCheckoutPage() {
     setTimeout(() => {
       handleAdminLogout();
       alert("⏳ Session expired. Please re-enter the passcode.");
-    }, 5 * 60 * 1000); // 5 minutes (300,000 ms)
+    }, 5 * 60 * 1000); 
   };
 
   const handleCheckOut = async (userId) => {
@@ -77,7 +76,6 @@ export default function AdminCheckoutPage() {
       <div className="admin-container">
       <h2  className="admin-title">👤 Check Out Users</h2>
 
-        {/* 🔹 Logout Button */}
         <button className="logout-btn" onClick={handleAdminLogout}>
           🔒 Logout
         </button>

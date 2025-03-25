@@ -1,293 +1,248 @@
-import { useEffect, useState, useRef } from "react";
-import "../assets/style/style.css"; // Import external CSS file
+import { useEffect, useState, useRef, useCallback, useMemo } from "react";
+import "../assets/style/style.css";
 import firestoreDB from "../db/fireStore";
 
+const DEFAULT_TIMER = 20 * 60; // 20 minutes in seconds
+const DEFAULT_AUDIO_URL = "https://codeskulptor-demos.commondatastorage.googleapis.com/descent/gotitem.mp3";
+
 export default function TimingSystem() {
+  const pageMode = useMemo(() =>
+    window.location.pathname.includes("timer") ? "timer" : "match",
+    []
+  );
 
-  /*comment out line below to clean the storage*/
-  localStorage.clear();
+  const [rows, setRows] = useState(() =>
+    JSON.parse(localStorage.getItem(`${pageMode}-rows`)) || [Array(4).fill(null)]
+  );
+  const [rowStatus, setRowStatus] = useState(() =>
+    JSON.parse(localStorage.getItem(`${pageMode}-rowStatus`)) || ["waiting"]
+  );
+  const [startTimes, setStartTimes] = useState(() =>
+    JSON.parse(localStorage.getItem("startTimes")) || []
+  );
+  const [finalTimes, setFinalTimes] = useState(() =>
+    JSON.parse(localStorage.getItem("finalTimes")) || []
+  );
+  const [timers, setTimers] = useState(() => {
+    try {
+      const savedStartTimes = JSON.parse(localStorage.getItem("startTimes")) || [];
+      const savedRowStatus = JSON.parse(localStorage.getItem(`${pageMode}-rowStatus`)) || [];
 
-  const pageMode = window.location.pathname.includes("timer")
-    ? "timer"
-    : "match";
-
-  const [rows, setRows] = useState(() => {
-    return (
-      JSON.parse(localStorage.getItem(`${pageMode}-rows`)) || [
-        Array(4).fill(null),
-      ]
-    );
+      return savedStartTimes.map((start, index) => {
+        if (start && savedRowStatus[index] === "started") {
+          const elapsed = Math.floor((Date.now() - start) / 1000);
+          return Math.max(DEFAULT_TIMER - elapsed, 0);
+        }
+        return DEFAULT_TIMER;
+      });
+    } catch (error) {
+      console.error("Error loading timers from localStorage:", error);
+      return [DEFAULT_TIMER];
+    }
   });
 
-  const [rowStatus, setRowStatus] = useState(() => {
-    return (
-      JSON.parse(localStorage.getItem(`${pageMode}-rowStatus`)) || ["waiting"]
-    );
-  });
+  const [users, setUsers] = useState([]);
+  const [selectedUser, setSelectedUser] = useState(null);
+  const timerRefs = useRef([]);
 
-  // Save to localStorage when rows or rowStatus changes
+  // Persist to localStorage
   useEffect(() => {
     localStorage.setItem(`${pageMode}-rows`, JSON.stringify(rows));
-  }, [rows]);
+  }, [rows, pageMode]);
 
   useEffect(() => {
     localStorage.setItem(`${pageMode}-rowStatus`, JSON.stringify(rowStatus));
-  }, [rowStatus]);
+  }, [rowStatus, pageMode]);
 
-  
+  useEffect(() => {
+    localStorage.setItem("startTimes", JSON.stringify(startTimes));
+  }, [startTimes]);
 
-  const [timers, setTimers] = useState(() => {
-    try {
-        const savedTimers = JSON.parse(localStorage.getItem("timers")) || [20 * 60];
-        const startTimes = JSON.parse(localStorage.getItem("startTimes")) || [];
-        
-        return savedTimers.map((time, index) => {
-          if (startTimes[index] && rowStatus[index] === "started") {
-            const elapsed = Math.floor((Date.now() - startTimes[index]) / 1000);
-            return Math.max(time - elapsed, 0); // Ensure non-negative timer values
-          }
-          return time;
-        });
-      } catch (error) {
-        console.error("Error loading timers from localStorage:", error);
-        return [20 * 60];
-      }
-    });
+  useEffect(() => {
+    localStorage.setItem("finalTimes", JSON.stringify(finalTimes));
+  }, [finalTimes]);
 
-  //Restart timer when component mounts!
+  // On mount, resume running timers
   useEffect(() => {
     timers.forEach((time, index) => {
       if (time > 0 && rowStatus[index] === "started") {
-        startTimer(index); // Restart the timer interval
+        startTimer(index, startTimes[index]);
       }
     });
   }, []);
-// const restoreTimers = () => {
-//     const startTimes = JSON.parse(localStorage.getItem("startTimes")) || [];
-//     const storedTimers = JSON.parse(localStorage.getItem("timers")) || [];
-//     const newTimers = [...storedTimers];
 
-//     startTimes.forEach((startTime, index) => {
-//       if (startTime && rowStatus[index] === "started") {
-//         const elapsedTime = Math.floor((Date.now() - startTime) / 1000);
-//         newTimers[index] = Math.max(storedTimers[index] - elapsedTime, 0); // Prevent negative timer
-//       }
-//     });
+  const handleTimeout = useCallback((rowIndex) => {
+    setFinalTimes((prev) => {
+      const updated = [...prev];
+      updated[rowIndex] = 0;
+      return updated;
+    });
+    setRowStatus((prev) => {
+      const updated = [...prev];
+      updated[rowIndex] = "ended";
+      return updated;
+    });
+    setStartTimes((prev) => {
+      const updated = [...prev];
+      updated[rowIndex] = null;
+      return updated;
+    });
+    playAlarm();
+    setUsers((prev) => [...prev, ...rows[rowIndex]]);
+  }, [rows]);
 
-//     setTimers(newTimers);
-//   };
+  const getCheckedInUsers = useCallback(async () => {
+    try {
+      const _users = await firestoreDB.getUsers();
+      const checkedInUsers = _users.filter((user) => user.checkedIn);
+      const rowsData = JSON.parse(localStorage.getItem(`${pageMode}-rows`)) || [[]];
+      const currentRowStatus = JSON.parse(localStorage.getItem(`${pageMode}-rowStatus`)) || ["waiting"];
 
-//   // 🚀 Restart timers when the component mounts (persists on navigation)
-//   useEffect(() => {
-//     restoreTimers();
-//     timers.forEach((time, index) => {
-//       if (time > 0 && rowStatus[index] === "started") {
-//         startTimer(index);
-//       }
-//     });
-//   }, []);
+      const usersInActiveRows = rowsData
+        .flat()
+        .filter(Boolean)
+        .filter((user, index) => currentRowStatus[Math.floor(index / 4)] !== "ended")
+        .map((user) => user.id);
 
-  // Final Times (Store separately for each mode)
-  const [finalTimes, setFinalTimes] = useState(() => {
-    return JSON.parse(localStorage.getItem("finalTimes")) || [];
-  });
-
-  // Function to start the countdown timer
-  const startTimer = (rowIndex) => {
-    if (timerRefs.current[rowIndex]) clearInterval(timerRefs.current[rowIndex]); // Clear existing timer
-
-    // Save start time in localStorage
-    const newStartTimes = JSON.parse(localStorage.getItem("startTimes")) || [];
-    newStartTimes[rowIndex] = Date.now();
-    localStorage.setItem("startTimes", JSON.stringify(newStartTimes));
-
-    timerRefs.current[rowIndex] = setInterval(() => {
-      setTimers((prevTimers) => {
-        const newTimers = [...prevTimers];
-        if (newTimers[rowIndex] > 0) {
-          newTimers[rowIndex] -= 1;
-          // localStorage.setItem("timers", JSON.stringify(newTimers)); // Persist timers
-
-        } else {
-          clearInterval(timerRefs.current[rowIndex]);
-          handleTimeout(rowIndex);
-        }
-        return newTimers;
-      });
-    }, 1000);
-  };
-
-  const timerRefs = useRef([]); // Store setInterval IDs for timers
-
-  // Track selected user for placing in a row
-  const [selectedUser, setSelectedUser] = useState(null);
-  const [users, setUsers] = useState([]);
-
-  async function getCheckedInUsers() {
-    console.log("Getting checked-in users...");
-
-    const _users = await firestoreDB.getUsers(); // Fetch checked-in users
-    const checkedInUsers = _users.filter((user) => user.checkedIn);
-
-    const rowsData = JSON.parse(localStorage.getItem(`${pageMode}-rows`)) || [
-      [],
-    ];
-    const rowStatus = JSON.parse(
-      localStorage.getItem(`${pageMode}-rowStatus`),
-    ) || ["waiting"];
-
-    // Get users who are in active rows (not "ended")
-    const usersInActiveRows = rowsData
-      .flat()
-      .filter(Boolean) // Remove null values
-      .filter((user, index) => rowStatus[Math.floor(index / 4)] !== "ended") // Keep only users in active rows
-      .map((user) => user.id);
-
-    // Set available users (excluding those in rows)
-    setUsers(
-      checkedInUsers.filter((user) => !usersInActiveRows.includes(user.id)),
-    );
-  }
+      setUsers(checkedInUsers.filter((user) => !usersInActiveRows.includes(user.id)));
+    } catch (error) {
+      console.error("Error fetching checked-in users:", error);
+    }
+  }, [pageMode]);
 
   useEffect(() => {
     getCheckedInUsers();
-  }, []);
+  }, [getCheckedInUsers]);
 
-  // Function to move a user to a row
-  const moveToRow = (rowIndex) => {
+  const startTimer = useCallback((rowIndex, startTime) => {
+    if (timerRefs.current[rowIndex]) {
+      clearInterval(timerRefs.current[rowIndex]);
+    }
+
+    timerRefs.current[rowIndex] = setInterval(() => {
+      const elapsed = Math.floor((Date.now() - startTime) / 1000);
+      const newTime = Math.max(DEFAULT_TIMER - elapsed, 0);
+
+      setTimers((prev) => {
+        const updated = [...prev];
+        updated[rowIndex] = newTime;
+        if (newTime === 0) {
+          clearInterval(timerRefs.current[rowIndex]);
+          handleTimeout(rowIndex);
+        }
+        return updated;
+      });
+    }, 1000);
+  }, [handleTimeout]);
+
+  const moveToRow = useCallback((rowIndex) => {
     if (!selectedUser || rowStatus[rowIndex] !== "waiting") return;
 
     const emptyIndex = rows[rowIndex].findIndex((slot) => slot === null);
     if (emptyIndex !== -1) {
-      setUsers(users.filter((u) => u.id !== selectedUser.id));
-      setRows((prevRows) => {
-        const newRows = [...prevRows];
+      setUsers((prev) => prev.filter((u) => u.id !== selectedUser.id));
+      setRows((prev) => {
+        const newRows = [...prev];
         newRows[rowIndex] = [...newRows[rowIndex]];
         newRows[rowIndex][emptyIndex] = selectedUser;
         return newRows;
       });
       setSelectedUser(null);
     }
-  };
+  }, [selectedUser, rowStatus, rows]);
 
-  // Move user back to list (only in "waiting" rows)
-  const moveBackToList = (rowIndex, slotIndex) => {
+  const moveBackToList = useCallback((rowIndex, slotIndex) => {
     if (rowStatus[rowIndex] !== "waiting") return;
 
     const user = rows[rowIndex][slotIndex];
     if (user) {
-      setRows((prevRows) => {
-        const newRows = [...prevRows];
+      setRows((prev) => {
+        const newRows = [...prev];
         newRows[rowIndex] = [...newRows[rowIndex]];
         newRows[rowIndex][slotIndex] = null;
         return newRows;
       });
-      setUsers([...users, user]);
+      setUsers((prev) => [...prev, user]);
     }
-  };
+  }, [rowStatus, rows]);
 
-  // Function to start a row (lock it and start the timer)
-  const startRow = (rowIndex) => {
+  const startRow = useCallback((rowIndex) => {
     if (rows[rowIndex].every((slot) => slot !== null)) {
-      setRowStatus((prevStatus) => {
-        const newStatus = [...prevStatus];
+      const now = Date.now();
+      setRowStatus((prev) => {
+        const newStatus = [...prev];
         newStatus[rowIndex] = "started";
         return newStatus;
       });
-      startTimer(rowIndex);
+      const newStartTimes = [...startTimes];
+      newStartTimes[rowIndex] = now;
+      setStartTimes(newStartTimes);
+      startTimer(rowIndex, now);
     }
-  };
+  }, [rows, startTimes, startTimer]);
 
-  // Function to restart the timer
-  const restartTimer = (rowIndex) => {
+  const restartTimer = useCallback((rowIndex) => {
+    const now = Date.now();
     const newTimers = [...timers];
-    newTimers[rowIndex] = 20 * 60; 
+    newTimers[rowIndex] = DEFAULT_TIMER;
     setTimers(newTimers);
-    localStorage.setItem("timers", JSON.stringify(newTimers));
 
-    // Reset start time
-    const newStartTimes = JSON.parse(localStorage.getItem("startTimes")) || [];
-    newStartTimes[rowIndex] = Date.now();
-    localStorage.setItem("startTimes", JSON.stringify(newStartTimes));
+    const newStartTimes = [...startTimes];
+    newStartTimes[rowIndex] = now;
+    setStartTimes(newStartTimes);
 
-    startTimer(rowIndex);
-  };
+    startTimer(rowIndex, now);
+  }, [timers, startTimes, startTimer]);
 
-  // Function to handle timeout (auto end at 00:00)
-  const handleTimeout = (rowIndex) => {
-    setFinalTimes((prevFinalTimes) => {
-      const newFinalTimes = [...prevFinalTimes];
-      newFinalTimes[rowIndex] = 0; // Store timeout as 00:00
+  
 
-      // Persist finalTimes in localStorage
-      localStorage.setItem("finalTimes", JSON.stringify(newFinalTimes));
-
-      return newFinalTimes;
+  const endRow = useCallback((rowIndex) => {
+    clearInterval(timerRefs.current[rowIndex]);
+    setFinalTimes((prev) => {
+      const updated = [...prev];
+      updated[rowIndex] = timers[rowIndex];
+      return updated;
     });
-
-    // Update rowStatus to "ended"
-    setRowStatus((prevStatus) => {
-      const newStatus = [...prevStatus];
-      newStatus[rowIndex] = "ended";
-      // Persist rowStatus
-      localStorage.setItem(`${pageMode}-rowStatus`, JSON.stringify(newStatus));
-      return newStatus;
+    setRowStatus((prev) => {
+      const updated = [...prev];
+      updated[rowIndex] = "ended";
+      return updated;
+    });
+    setStartTimes((prev) => {
+      const updated = [...prev];
+      updated[rowIndex] = null;
+      return updated;
     });
     playAlarm();
-    // Move users back to the available list (only if it's the timed mode)
-    setUsers([...users, ...rows[rowIndex]]);
-  };
+    setUsers((prev) => [...prev, ...rows[rowIndex]]);
+  }, [timers, rows]);
 
-  // Function to manually end a row (before 00:00)
-  const endRow = (rowIndex) => {
-    clearInterval(timerRefs.current[rowIndex]); // Stop timer
+  const addNewRow = useCallback(() => {
+    setRows((prev) => [...prev, Array(4).fill(null)]);
+    setRowStatus((prev) => [...prev, "waiting"]);
+    setTimers((prev) => [...prev, DEFAULT_TIMER]);
+    setFinalTimes((prev) => [...prev, null]);
+  }, []);
 
-    setFinalTimes((prevFinalTimes) => {
-      const newFinalTimes = [...prevFinalTimes];
-      newFinalTimes[rowIndex] = timers[rowIndex]; // Store last recorded time
-      localStorage.setItem("finalTimes", JSON.stringify(newFinalTimes));
-      return newFinalTimes;
-    });
-
-    setRowStatus((prevStatus) => {
-      const newStatus = [...prevStatus];
-      newStatus[rowIndex] = "ended";
-      return newStatus;
-    });
-    playAlarm();
-    // Move users back to the left list
-    setUsers([...users, ...rows[rowIndex]]);
-  };
-
-  // Function to add a new row
-  const addNewRow = () => {
-    setRows([...rows, Array(4).fill(null)]);
-    setRowStatus([...rowStatus, "waiting"]);
-    setTimers([...timers, 20 * 60]); 
-    setFinalTimes(finalTimes ? [...finalTimes, null] : [null]);
-  };
-
-  // Convert time in seconds to MM:SS format
-  const formatTime = (seconds) => {
-    const minutes = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${minutes}:${secs < 10 ? "0" : ""}${secs}`;
-  };
-
-  // Function to play an alarm when time reaches 0
   const playAlarm = () => {
-    const audio = new Audio("https://www.soundjay.com/button/beep-07.wav");
-    audio.play();
+    const audio = new Audio(DEFAULT_AUDIO_URL);
+    audio.play().catch((e) => console.warn("Playback failed", e));
+    
+  };
+
+  const formatTime = (seconds) => {
+    const min = Math.floor(seconds / 60);
+    const sec = seconds % 60;
+    return `${min}:${sec < 10 ? "0" : ""}${sec}`;
   };
 
   return (
     <div className="container">
-      {/* Left Side: User List */}
       <div className="user-list">
         <h3>Available Users</h3>
         {users.map((user) => (
           <div
-            key={user}
+            key={user.id}
             onClick={() => setSelectedUser(user)}
             className={`user-item ${selectedUser === user ? "selected-user" : ""}`}
           >
@@ -296,7 +251,6 @@ export default function TimingSystem() {
         ))}
       </div>
 
-      {/* Right Side: Slot Grid */}
       <div className="slot-grid">
         {rows.map((slots, rowIndex) => (
           <div key={rowIndex} className="row-container">
@@ -311,42 +265,26 @@ export default function TimingSystem() {
                 </div>
               ))}
             </div>
-
-            {/* Row selection button */}
             {selectedUser && rowStatus[rowIndex] === "waiting" && (
-              <button
-                onClick={() => moveToRow(rowIndex)}
-                className="add-button"
-              >
+              <button onClick={() => moveToRow(rowIndex)} className="add-button">
                 Add {selectedUser.name} to Row {rowIndex + 1}
               </button>
             )}
-
-            {/* Timer Display */}
             <h3 className="timer-display">
-              {console.log(rowIndex, finalTimes[rowIndex])}
-              {console.log("here")}⏳{" "}
-              {formatTime(finalTimes?.[rowIndex] ?? timers[rowIndex] ?? 0)}
+              ⏳ {formatTime(
+    rowStatus[rowIndex] === "waiting"
+      ? DEFAULT_TIMER
+      : finalTimes?.[rowIndex] ?? timers[rowIndex] ?? 0)}
             </h3>
-
-            {/* Start Button (Only if row is full and hasn't started) */}
             {rowStatus[rowIndex] === "waiting" &&
               slots.every((slot) => slot !== null) && (
-                <button
-                  onClick={() => startRow(rowIndex)}
-                  className="start-button"
-                >
+                <button onClick={() => startRow(rowIndex)} className="start-button">
                   Start
                 </button>
               )}
-
-            {/* End Button (Only if row is started) */}
             {rowStatus[rowIndex] === "started" && timers[rowIndex] > 0 && (
               <>
-                <button
-                  onClick={() => restartTimer(rowIndex)}
-                  className="restart-button"
-                >
+                <button onClick={() => restartTimer(rowIndex)} className="restart-button">
                   Restart
                 </button>
                 <button onClick={() => endRow(rowIndex)} className="end-button">
@@ -356,8 +294,6 @@ export default function TimingSystem() {
             )}
           </div>
         ))}
-
-        {/* Add Row Button */}
         <button onClick={addNewRow} className="add-row-button">
           + Add Row
         </button>

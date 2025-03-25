@@ -1,81 +1,70 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import firestoreDB from "../db/fireStore";
+const DEFAULT_AUDIO_URL = "https://codeskulptor-demos.commondatastorage.googleapis.com/descent/gotitem.mp3";
 
 export default function MatchSystem() {
-  // Example list of logged-in users
-  //const [users, setUsers] = useState(["Alice", "Bob", "Charlie", "David", "Eve", "Frank", "Grace", "Hank"]);
+  const pageMode = useMemo(() => 
+    window.location.pathname.includes("timer") ? "timer" : "match", 
+    []
+  );
 
+  // State initialization with localStorage
   const [users, setUsers] = useState([]);
-  const pageMode = window.location.pathname.includes("timer")
-    ? "timer"
-    : "match";
+  const [rows, setRows] = useState(() => 
+    JSON.parse(localStorage.getItem(`${pageMode}-rows`)) || [Array(4).fill(null)]
+  );
 
-  async function getCheckedInUsers() {
-    console.log("Getting checked-in users...");
+  const [rowStatus, setRowStatus] = useState(() => 
+    JSON.parse(localStorage.getItem(`${pageMode}-rowStatus`)) || ["waiting"]
+  );
 
-    const _users = await firestoreDB.getUsers(); // Fetch checked-in users
-    const checkedInUsers = _users.filter((user) => user.checkedIn);
+  const [selectedUser, setSelectedUser] = useState(null);
 
-    const rowsData = JSON.parse(localStorage.getItem(`${pageMode}-rows`)) || [
-      [],
-    ];
-    const rowStatus = JSON.parse(
-      localStorage.getItem(`${pageMode}-rowStatus`),
-    ) || ["waiting"];
-
-    // Get users who are in active rows (not "ended")
-    const usersInActiveRows = rowsData
-      .flat()
-      .filter(Boolean) // Remove null values
-      .filter((user, index) => rowStatus[Math.floor(index / 4)] !== "ended") // Keep only users in active rows
-      .map((user) => user.id);
-
-    // Set available users (excluding those in rows)
-    setUsers(
-      checkedInUsers.filter((user) => !usersInActiveRows.includes(user.id)),
-    );
-  }
-
-  useEffect(() => {
-    getCheckedInUsers();
-  }, []);
-
-  // State for multiple rows of slots
-  // const [rows, setRows] = useState([Array(4).fill(null)]);
-  const [rows, setRows] = useState(() => {
-    return (
-      JSON.parse(localStorage.getItem(`${pageMode}-rows`)) || [
-        Array(4).fill(null),
-      ]
-    );
-  });
-
-  const [rowStatus, setRowStatus] = useState(() => {
-    return (
-      JSON.parse(localStorage.getItem(`${pageMode}-rowStatus`)) || ["waiting"]
-    );
-  });
-
-  // Save to localStorage when rows or rowStatus changes
+  // Persist rows and row status to localStorage
   useEffect(() => {
     localStorage.setItem(`${pageMode}-rows`, JSON.stringify(rows));
-  }, [rows]);
+  }, [rows, pageMode]);
 
   useEffect(() => {
     localStorage.setItem(`${pageMode}-rowStatus`, JSON.stringify(rowStatus));
-  }, [rowStatus]);
+  }, [rowStatus, pageMode]);
 
-  // Track selected user for placing in a row
-  const [selectedUser, setSelectedUser] = useState(null);
+  // Fetch checked-in users
+  const getCheckedInUsers = useCallback(async () => {
+    try {
+      const _users = await firestoreDB.getUsers();
+      const checkedInUsers = _users.filter((user) => user.checkedIn);
+
+      const rowsData = JSON.parse(localStorage.getItem(`${pageMode}-rows`)) || [[]];
+      const currentRowStatus = JSON.parse(localStorage.getItem(`${pageMode}-rowStatus`)) || ["waiting"];
+
+      const usersInActiveRows = rowsData
+        .flat()
+        .filter(Boolean)
+        .filter((user, index) => currentRowStatus[Math.floor(index / 4)] !== "ended")
+        .map((user) => user.id);
+
+      setUsers(
+        checkedInUsers.filter((user) => !usersInActiveRows.includes(user.id))
+      );
+    } catch (error) {
+      console.error("Error fetching checked-in users:", error);
+    }
+  }, [pageMode]);
+
+  // Fetch users on component mount
+  useEffect(() => {
+    getCheckedInUsers();
+  }, [getCheckedInUsers]);
 
   // Move user into selected row
-  const moveToRow = (rowIndex) => {
+  const moveToRow = useCallback((rowIndex) => {
     if (!selectedUser || rowStatus[rowIndex] !== "waiting") return;
 
     const emptyIndex = rows[rowIndex].findIndex((slot) => slot === null);
     if (emptyIndex !== -1) {
-      setUsers(users.filter((u) => u.id !== selectedUser.id));
-      setRows((prevRows) => {
+      setUsers(prevUsers => prevUsers.filter((u) => u.id !== selectedUser.id));
+      setRows(prevRows => {
         const newRows = [...prevRows];
         newRows[rowIndex] = [...newRows[rowIndex]];
         newRows[rowIndex][emptyIndex] = selectedUser;
@@ -83,51 +72,58 @@ export default function MatchSystem() {
       });
       setSelectedUser(null);
     }
-  };
+  }, [selectedUser, rowStatus, rows]);
 
   // Move user back to list (only in "waiting" rows)
-  const moveBackToList = (rowIndex, slotIndex) => {
+  const moveBackToList = useCallback((rowIndex, slotIndex) => {
     if (rowStatus[rowIndex] !== "waiting") return;
 
     const user = rows[rowIndex][slotIndex];
     if (user) {
-      setRows((prevRows) => {
+      setRows(prevRows => {
         const newRows = [...prevRows];
         newRows[rowIndex] = [...newRows[rowIndex]];
         newRows[rowIndex][slotIndex] = null;
         return newRows;
       });
-      setUsers([...users, user]);
+      setUsers(prevUsers => [...prevUsers, user]);
     }
-  };
+  }, [rowStatus, rows]);
 
   // Add a new row
-  const addNewRow = () => {
-    setRows([...rows, Array(4).fill(null)]);
-    setRowStatus([...rowStatus, "waiting"]);
-  };
+  const addNewRow = useCallback(() => {
+    setRows(prevRows => [...prevRows, Array(4).fill(null)]);
+    setRowStatus(prevStatus => [...prevStatus, "waiting"]);
+  }, []);
 
   // Start a row (lock it)
-  const startRow = (rowIndex) => {
+  const startRow = useCallback((rowIndex) => {
     if (rows[rowIndex].every((slot) => slot !== null)) {
-      setRowStatus((prevStatus) => {
+      setRowStatus(prevStatus => {
         const newStatus = [...prevStatus];
         newStatus[rowIndex] = "started";
         return newStatus;
       });
     }
-  };
+  }, [rows]);
 
   // End a row (reset but keep it visible)
-  const endRow = (rowIndex) => {
-    setRowStatus((prevStatus) => {
+  const endRow = useCallback((rowIndex) => {
+    setRowStatus(prevStatus => {
       const newStatus = [...prevStatus];
       newStatus[rowIndex] = "ended";
       return newStatus;
     });
+    playAlarm();
 
     // Move users back to the list
-    setUsers([...users, ...rows[rowIndex]]);
+    setUsers(prevUsers => [...prevUsers, ...rows[rowIndex]]);
+  }, [rows]);
+
+  const playAlarm = () => {
+    const audio = new Audio(DEFAULT_AUDIO_URL);
+    audio.play().catch((e) => console.warn("Playback failed", e));
+    
   };
 
   return (
@@ -137,12 +133,11 @@ export default function MatchSystem() {
         <h3>Available Users</h3>
         {users.map((user) => (
           <div
-            key={user}
+            key={user.id}
             onClick={() => setSelectedUser(user)}
             className={`user-item ${selectedUser === user ? "selected-user" : ""}`}
           >
             {user.name}
-            {console.log(user)}
           </div>
         ))}
       </div>
