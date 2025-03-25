@@ -44,16 +44,17 @@ export default function RegisterPage() {
     <BaseTemplate>
       <div className="auth-container">
         <h2>Join our Group</h2>
-        
+
         {error && <p className="error">{error}</p>}
 
         {/* 🔹 Show success message after registration */}
         {successMessage ? (
           <div className="success-message">
-            <h3>{successMessage}</h3>     
-           
-            <a href="/login"  className="button">Check in!!</a>
-          
+            <h3>{successMessage}</h3>
+
+            <a href="/login" className="button">
+              Check in!!
+            </a>
           </div>
         ) : (
           <form onSubmit={handleRegister}>
@@ -93,4 +94,3 @@ export default function RegisterPage() {
     </BaseTemplate>
   );
 }
-

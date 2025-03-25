@@ -40,32 +40,32 @@ function FirestoreDB() {
 
     console.log("users", usersList);
     return usersList;
-  };
+  }
 
   async function verifyUser(email, password) {
     try {
       const q = query(collection(db, "users"), where("email", "==", email));
       const querySnapshot = await getDocs(q);
-  
+
       if (querySnapshot.empty) {
         return { success: false, error: "User not found." };
       }
-  
+
       const userDoc = querySnapshot.docs[0];
       const userData = userDoc.data();
-  
+
       // Check password
       if (userData.password !== password) {
         return { success: false, error: "Incorrect password." };
       }
-  
+
       // ✅ Return user ID and data
       return { success: true, user: { id: userDoc.id, ...userData } };
     } catch (error) {
       console.error("Login error:", error);
       return { success: false, error: "Login failed. Please try again." };
     }
-  };
+  }
 
   async function checkInUser(userId) {
     try {
@@ -76,7 +76,7 @@ function FirestoreDB() {
       console.error("Check-in error:", error);
       return { success: false, error: "Check-in failed." };
     }
-  };
+  }
 
   async function registerUser(name, email, password) {
     try {
@@ -86,18 +86,20 @@ function FirestoreDB() {
         password, // Note: Consider hashing passwords for security
         checkedIn: false,
       });
-  
+
       return { success: true, userId: userRef.id };
     } catch (error) {
       console.error("Registration error:", error);
-      return { success: false, error: "Registration failed. Please try again." };
+      return {
+        success: false,
+        error: "Registration failed. Please try again.",
+      };
     }
   }
 
   async function deleteUser(userId) {
     await deleteDoc(doc(db, "users", userId));
   }
-
 
   async function checkOutUser(userId) {
     try {
@@ -115,11 +117,10 @@ function FirestoreDB() {
   firestoreDB.checkInUser = checkInUser;
   firestoreDB.registerUser = registerUser;
   firestoreDB.deleteUser = deleteUser;
-  firestoreDB.checkOutUser =checkOutUser;
+  firestoreDB.checkOutUser = checkOutUser;
 
   return firestoreDB;
 }
 const firestoreDB = FirestoreDB();
-
 
 export default firestoreDB;

@@ -25,12 +25,18 @@ function NavBar() {
             <Nav.Link href="/match-mode">MatchMode</Nav.Link>
           </Nav>
           <Nav className="ms-auto">
-          <Nav.Link href="/login">CheckIn</Nav.Link>
-          <Nav.Link href="/register">Register</Nav.Link>
+            <Nav.Link href="/login">CheckIn</Nav.Link>
+            <Nav.Link href="/register">Register</Nav.Link>
             <NavDropdown title="Admin" id="basic-nav-dropdown">
-              <NavDropdown.Item href="/admin/delete">Delete User</NavDropdown.Item>
-              <NavDropdown.Item href="/admin/checkout">Checkout User</NavDropdown.Item>
-              <NavDropdown.Item href="/admin/reset">Reset Game</NavDropdown.Item>
+              <NavDropdown.Item href="/admin/delete">
+                Delete User
+              </NavDropdown.Item>
+              <NavDropdown.Item href="/admin/checkout">
+                Checkout User
+              </NavDropdown.Item>
+              <NavDropdown.Item href="/admin/reset">
+                Reset Game
+              </NavDropdown.Item>
             </NavDropdown>
           </Nav>
         </Navbar.Collapse>

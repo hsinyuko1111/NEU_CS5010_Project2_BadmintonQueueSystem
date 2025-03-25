@@ -1,21 +1,26 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import firestoreDB from "../db/fireStore";
-const DEFAULT_AUDIO_URL = "https://codeskulptor-demos.commondatastorage.googleapis.com/descent/gotitem.mp3";
+const DEFAULT_AUDIO_URL =
+  "https://codeskulptor-demos.commondatastorage.googleapis.com/descent/gotitem.mp3";
 
 export default function MatchSystem() {
-  const pageMode = useMemo(() => 
-    window.location.pathname.includes("timer") ? "timer" : "match", 
-    []
+  const pageMode = useMemo(
+    () => (window.location.pathname.includes("timer") ? "timer" : "match"),
+    [],
   );
 
   // State initialization with localStorage
   const [users, setUsers] = useState([]);
-  const [rows, setRows] = useState(() => 
-    JSON.parse(localStorage.getItem(`${pageMode}-rows`)) || [Array(4).fill(null)]
+  const [rows, setRows] = useState(
+    () =>
+      JSON.parse(localStorage.getItem(`${pageMode}-rows`)) || [
+        Array(4).fill(null),
+      ],
   );
 
-  const [rowStatus, setRowStatus] = useState(() => 
-    JSON.parse(localStorage.getItem(`${pageMode}-rowStatus`)) || ["waiting"]
+  const [rowStatus, setRowStatus] = useState(
+    () =>
+      JSON.parse(localStorage.getItem(`${pageMode}-rowStatus`)) || ["waiting"],
   );
 
   const [selectedUser, setSelectedUser] = useState(null);
@@ -35,17 +40,23 @@ export default function MatchSystem() {
       const _users = await firestoreDB.getUsers();
       const checkedInUsers = _users.filter((user) => user.checkedIn);
 
-      const rowsData = JSON.parse(localStorage.getItem(`${pageMode}-rows`)) || [[]];
-      const currentRowStatus = JSON.parse(localStorage.getItem(`${pageMode}-rowStatus`)) || ["waiting"];
+      const rowsData = JSON.parse(localStorage.getItem(`${pageMode}-rows`)) || [
+        [],
+      ];
+      const currentRowStatus = JSON.parse(
+        localStorage.getItem(`${pageMode}-rowStatus`),
+      ) || ["waiting"];
 
       const usersInActiveRows = rowsData
         .flat()
         .filter(Boolean)
-        .filter((user, index) => currentRowStatus[Math.floor(index / 4)] !== "ended")
+        .filter(
+          (user, index) => currentRowStatus[Math.floor(index / 4)] !== "ended",
+        )
         .map((user) => user.id);
 
       setUsers(
-        checkedInUsers.filter((user) => !usersInActiveRows.includes(user.id))
+        checkedInUsers.filter((user) => !usersInActiveRows.includes(user.id)),
       );
     } catch (error) {
       console.error("Error fetching checked-in users:", error);
@@ -58,72 +69,85 @@ export default function MatchSystem() {
   }, [getCheckedInUsers]);
 
   // Move user into selected row
-  const moveToRow = useCallback((rowIndex) => {
-    if (!selectedUser || rowStatus[rowIndex] !== "waiting") return;
+  const moveToRow = useCallback(
+    (rowIndex) => {
+      if (!selectedUser || rowStatus[rowIndex] !== "waiting") return;
 
-    const emptyIndex = rows[rowIndex].findIndex((slot) => slot === null);
-    if (emptyIndex !== -1) {
-      setUsers(prevUsers => prevUsers.filter((u) => u.id !== selectedUser.id));
-      setRows(prevRows => {
-        const newRows = [...prevRows];
-        newRows[rowIndex] = [...newRows[rowIndex]];
-        newRows[rowIndex][emptyIndex] = selectedUser;
-        return newRows;
-      });
-      setSelectedUser(null);
-    }
-  }, [selectedUser, rowStatus, rows]);
+      const emptyIndex = rows[rowIndex].findIndex((slot) => slot === null);
+      if (emptyIndex !== -1) {
+        setUsers((prevUsers) =>
+          prevUsers.filter((u) => u.id !== selectedUser.id),
+        );
+        setRows((prevRows) => {
+          const newRows = [...prevRows];
+          newRows[rowIndex] = [...newRows[rowIndex]];
+          newRows[rowIndex][emptyIndex] = selectedUser;
+          return newRows;
+        });
+        setSelectedUser(null);
+      }
+    },
+    [selectedUser, rowStatus, rows],
+  );
 
   // Move user back to list (only in "waiting" rows)
-  const moveBackToList = useCallback((rowIndex, slotIndex) => {
-    if (rowStatus[rowIndex] !== "waiting") return;
+  const moveBackToList = useCallback(
+    (rowIndex, slotIndex) => {
+      if (rowStatus[rowIndex] !== "waiting") return;
 
-    const user = rows[rowIndex][slotIndex];
-    if (user) {
-      setRows(prevRows => {
-        const newRows = [...prevRows];
-        newRows[rowIndex] = [...newRows[rowIndex]];
-        newRows[rowIndex][slotIndex] = null;
-        return newRows;
-      });
-      setUsers(prevUsers => [...prevUsers, user]);
-    }
-  }, [rowStatus, rows]);
+      const user = rows[rowIndex][slotIndex];
+      if (user) {
+        setRows((prevRows) => {
+          const newRows = [...prevRows];
+          newRows[rowIndex] = [...newRows[rowIndex]];
+          newRows[rowIndex][slotIndex] = null;
+          return newRows;
+        });
+        setUsers((prevUsers) => [...prevUsers, user]);
+      }
+    },
+    [rowStatus, rows],
+  );
 
   // Add a new row
   const addNewRow = useCallback(() => {
-    setRows(prevRows => [...prevRows, Array(4).fill(null)]);
-    setRowStatus(prevStatus => [...prevStatus, "waiting"]);
+    setRows((prevRows) => [...prevRows, Array(4).fill(null)]);
+    setRowStatus((prevStatus) => [...prevStatus, "waiting"]);
   }, []);
 
   // Start a row (lock it)
-  const startRow = useCallback((rowIndex) => {
-    if (rows[rowIndex].every((slot) => slot !== null)) {
-      setRowStatus(prevStatus => {
-        const newStatus = [...prevStatus];
-        newStatus[rowIndex] = "started";
-        return newStatus;
-      });
-    }
-  }, [rows]);
+  const startRow = useCallback(
+    (rowIndex) => {
+      if (rows[rowIndex].every((slot) => slot !== null)) {
+        setRowStatus((prevStatus) => {
+          const newStatus = [...prevStatus];
+          newStatus[rowIndex] = "started";
+          return newStatus;
+        });
+      }
+    },
+    [rows],
+  );
 
   // End a row (reset but keep it visible)
-  const endRow = useCallback((rowIndex) => {
-    setRowStatus(prevStatus => {
-      const newStatus = [...prevStatus];
-      newStatus[rowIndex] = "ended";
-      return newStatus;
-    });
-    playAlarm();
+  const endRow = useCallback(
+    (rowIndex) => {
+      setRowStatus((prevStatus) => {
+        const newStatus = [...prevStatus];
+        newStatus[rowIndex] = "ended";
+        return newStatus;
+      });
+      playAlarm();
 
-    // Move users back to the list
-    setUsers(prevUsers => [...prevUsers, ...rows[rowIndex]]);
-  }, [rows]);
+      // Move users back to the list
+      setUsers((prevUsers) => [...prevUsers, ...rows[rowIndex]]);
+    },
+    [rows],
+  );
 
   const playAlarm = () => {
     const audio = new Audio(DEFAULT_AUDIO_URL);
     audio.play().catch((e) => console.warn("Playback failed", e));
-    
   };
 
   return (

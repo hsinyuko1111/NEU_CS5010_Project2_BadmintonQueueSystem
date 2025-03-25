@@ -38,14 +38,16 @@ export default function LoginPage() {
     <BaseTemplate>
       <div className="auth-container">
         <h2>Check-In</h2>
-        
+
         {error && <p className="error">{error}</p>}
 
         {checkedIn ? (
           <div className="success-message">
             <h3>✅ You are checked in, {user.name}! 🎉</h3>
             <p>Enjoy your game now!</p>
-            <a href="/match-mode" className="button">Start Playing</a> 
+            <a href="/match-mode" className="button">
+              Start Playing
+            </a>
           </div>
         ) : (
           <form onSubmit={handleLogin}>
@@ -76,4 +78,3 @@ export default function LoginPage() {
     </BaseTemplate>
   );
 }
-
