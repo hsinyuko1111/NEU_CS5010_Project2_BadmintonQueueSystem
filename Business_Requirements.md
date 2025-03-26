@@ -2,7 +2,7 @@
 
 ## 1. Introduction
 
-The Badminton Lining System is designed to streamline player rotations efficiently at a badminton court. It ensures fair playtime and seamless match management by providing two distinct game modes: Quick Start Mode and Timer Mode. This system enhances user experience by allowing players to track their turn, manage game durations, and automate lineup movements.
+The Badminton Lining System is designed to streamline player rotations efficiently at a badminton court. It ensures fair playtime and seamless match management by providing two distinct game modes: Match Mode and Timer Mode. This system enhances user experience by allowing players to track their turn, manage game durations, and automate lineup movements.
 
 With the growing popularity of badminton at recreational clubs and professional venues, efficient court management has become essential. Current manual rotation systems often lead to confusion, unequal court time, and frustration among players waiting for their turn.
 
@@ -16,29 +16,46 @@ With the growing popularity of badminton at recreational clubs and professional 
 
 ## 2. Core Features
 
-### Quick Start Mode
+### Match Mode
 
-- Players line up in groups and start matches instantly.
+- Players line up in rows of four and start matches instantly.
 - Once a group finishes playing, their names turn grey and move back to the left sidebar.
-- Ensures continuous gameplay without manual intervention.
-- **Benefits**: Minimizes downtime between matches and reduces administrative overhead.
+- Row backgrounds change color based on match status: Yellow while playing. Grey once ended.
+- No timer is enforced; this mode is ideal for fast turnover and simple play. (Usually two games)
+- **Benefits**: Keeps games flowing quickly with minimal setup and low friction.
 
 ### Timer Mode
 
 - A 20-minute countdown timer starts when a match begins.
-- The Start button changes to Restart, allowing players to reset the timer back to 20:00.
+- Players can restart the timer at any time before 0:00, resetting it to 20:00.
 - Players can also manually End the game early, sending players back to the left sidebar.
-- Ensures fair court usage by limiting match durations.
+- Timer progress persists even when the page is refreshed or the user navigates away.
 - **Benefits**: Promotes equal court access and prevents court monopolization.
 
-### Player Management
+### Player Management (Checkin and Registration)
 
-- Registered players' names appear on the left sidebar upon login.
-- Players can join a lineup by selecting an empty spot in a four-row grid and choosing their name.
+- Players can register as a user with name, email, and password. 
+- Players can check in with email and password to appear in the available player list.
+- No sign-out is required; the system treats login as a check-in event.
+- Registered and checked-in users are shown on the left panel in matching page.
+- Players can join any available row (four players per row).
 - After each match, players automatically return to the waiting list for smooth rotations.
 - **Benefits**: Creates a transparent queue system that all participants can monitor.
 
-**Note**: Quick Start Mode and Timer Mode can be selected on a per-court basis and cannot run simultaneously on the same court.
+**Note**: Match Mode and Timer Mode can be selected on a court basis and cannot run simultaneously on the same court.
+
+### Admin Tools
+
+- With the passcode entered, Admin can: 
+    - clear local storage to allows reset of the lining state if needed.
+    - check out users 
+    - delete users 
+
+### Future-Proof Features 
+
+- Firestore integration for syncing check-in status across devices
+- Admin dashboard to track total playtime and queue lengths
+- Mobile-friendly version for easier in-court use
 
 ## 3. Target Audience
 
@@ -77,33 +94,7 @@ With the growing popularity of badminton at recreational clubs and professional 
 - In case of an odd number of players, the system will highlight the need for one more player before a match can begin.
 - Players can form partial groups while waiting for additional members to join.
 
-## 5. Acceptance Criteria
-
-### Quick Start Mode
-
-- AC1: Players must be able to form groups of 4 and begin matches within 3 clicks.
-- AC2: When a match ends, player names should automatically turn grey and move to waiting list within 5 seconds.
-- AC3: The system must maintain the original order of players in the waiting list.
-- AC4: The system must visually indicate which courts are currently active.
-
-### Timer Mode
-
-- AC1: Timer must start at exactly 20:00 and count down in 1-second intervals.
-- AC2: An audible notification must sound when time expires.
-- AC3: The Restart button must reset the timer to 20:00 without affecting player positions.
-- AC4: The End button must immediately terminate the current match and return players to the waiting list.
-- AC5: Timer accuracy must remain within 2 seconds of actual elapsed time over a 20-minute period.
-
-### Player Management
-
-- AC1: New player registration must require unique names to avoid conflicts.
-- AC2: The system must accommodate at least 50 active players in the waiting list.
-- AC3: Player login status must persist for at least 8 hours.
-- AC4: The system must visually differentiate between available and unavailable players.
-- AC5: Players must be able to remove themselves from the lineup with a single action.
-- AC6: The system must prevent players from joining multiple lineups simultaneously.
-
-## 6. Challenge Questions & Considerations
+## 5. Challenge Questions & Considerations
 
 - How can we balance efficiency and fairness in player rotations?
 
@@ -124,7 +115,7 @@ With the growing popularity of badminton at recreational clubs and professional 
   - Implement performance optimization for high-traffic periods.
   - Consider feature for pre-booking time slots during known busy periods.
 
-## 7. Implementation Considerations
+## 6. Implementation Considerations
 
 - **Mobile Responsiveness**: The system must function on devices ranging from smartphones to large tablets with adaptive layouts.
 - **Data Storage**: Player profiles and match history should be stored for at least 6 months.
@@ -270,7 +261,6 @@ Register, Login, Join, Click, Select, Start, Restart, End, Move, Reset, Track, D
 ### Persona 1: Alex, the Casual Player
 
 **User Stories:**
-
 - "As a badminton player, I want to join a lineup with my group so that I can track when it's my turn to play."
 - "As a badminton player, I want to see my name in the lineup so that I can ensure my participation."
 - "As a badminton player, I want an intuitive UI so that I can easily navigate and join a game."
@@ -278,7 +268,6 @@ Register, Login, Join, Click, Select, Start, Restart, End, Move, Reset, Track, D
 ### Persona 2: Sam, the Court Organizer
 
 **User Stories:**
-
 - "As a court organizer, I want a quick start mode that instantly moves players back to the waiting list after their game so that I can maintain a smooth rotation."
 - "As a court organizer, I want an overview of the lineup so that I can monitor game progress efficiently."
 - "As a court organizer, I want the ability to remove inactive players from the lineup so that I can keep the system organized."
@@ -286,7 +275,6 @@ Register, Login, Join, Click, Select, Start, Restart, End, Move, Reset, Track, D
 ### Persona 3: Jordan, the Competitive Player
 
 **User Stories:**
-
 - "As a competitive player, I want to use timer mode to ensure fair playtime so that no one overuses the court."
 - "As a competitive player, I want my match history available so that I can analyze my performance."
 - "As a competitive player, I want notifications for when my turn is coming up so that I don't miss my match."
@@ -294,7 +282,6 @@ Register, Login, Join, Click, Select, Start, Restart, End, Move, Reset, Track, D
 ### Persona 4: Lisa, the Beginner Player
 
 **User Stories:**
-
 - "As a beginner player, I want a clear and simple way to join a game so that I don't feel overwhelmed when trying to participate."
 - "As a beginner player, I want a help section explaining the lineup process so that I can understand how to use the system."
 - "As a beginner player, I want to be able to undo my selection in case I click on the wrong lineup slot."
@@ -311,19 +298,19 @@ Register, Login, Join, Click, Select, Start, Restart, End, Move, Reset, Track, D
 
 - ** 1 - Business Requirements **
   Q: “Generate a Business Requirement Document based on this project proposal.”
-  A: ChatGPT structured the document into sections, including Introduction, Core Features, Target Audience, Rules, Challenge Questions, Implementation Considerations, and User Personas.
+  A: Respnse in Section 1 to 6. ChatGPT structured the document into sections, including Introduction, Core Features, Target Audience, Rules, Challenge Questions, Implementation Considerations. I have changed minor logical error in the content.
 
 - ** 2 - Classifying Nouns & Verbs into Classes and Attributes **
   Q: “Is this class separation correct based on these nouns and verbs?”
-  A: ChatGPT refined the classification of system entities (e.g., Player, Court, Timer) and system actions (e.g., join, start, restart) to ensure they aligned properly with object-oriented principles.
+  A: Response in Section 8. ChatGPT refined the classification of system entities (e.g., Player, Court, Timer) and system actions (e.g., join, start, restart) to ensure they aligned properly with object-oriented principles.
 
 - ** 3 - User Classification & Ranking **
   Q: “Consider user classification using their level of interest in the system, how often they use it, the type of device they will use, and their role in content.”
-  A: ChatGPT categorized users based on engagement level, experience, usage frequency, and administrative role, helping define the needs of players, organizers, and club administrators.
+  A: Response in section 9. ChatGPT categorized users based on engagement level, experience, usage frequency, and administrative role, helping define the needs of players, organizers, and club administrators.
 
 - ** 4 - Creating User Personas **
   Q: “Generate User Persona based on this table for me.” (The table is shown in the previous section)
-  A: ChatGPT generated four detailed user personas:
+  A: Response in section 9. ChatGPT generated four detailed user personas:
 
 Alex, the Casual Player
 Sam, the Court Organizer
@@ -333,10 +320,99 @@ Each persona included age, background, engagement level, experience level, usage
 
 - ** 5 - User Stories **
   Q: “Create three user stories for each persona.”
-  A: ChatGPT developed three user stories per persona, ensuring that their primary needs were addressed. Examples:
+  A: Respnse in section 10. ChatGPT developed three user stories per persona, ensuring that their primary needs were addressed. Examples:
 
 "As a competitive player, I want to use timer mode to ensure fair playtime so that no one overuses the court."
 "As a beginner player, I want a help section explaining the lineup process so that I can understand how to use the system."
+
+- ** 6 - Firebase CLI Issue **
+Q: "Why does 'firebase init hosting' show command not found?"
+A: ChatGPT explained it's because Firebase CLI was not installed. Solution: run npm install -g firebase-tools and then verify using firebase --version.
+
+- ** 7 - Is the main file equal to App? **
+Q: "Is my main file the same as App.jsx?"
+A: Yes. ChatGPT confirmed that routing defined directly in index.js is equivalent to using an App component, but recommended moving logic to an App.jsx file for clarity and state management.
+
+- ** 8 - Using user state in App **
+Q: "I'm not using the user state in App.jsx — is that bad?"
+A: ChatGPT explained that user state should be used to control access and redirect based on login status. It suggested adding conditional rendering and explained how to manage check-in without sign-out.
+
+- ** 9 - Login System with Firebase **
+Q: "How do I make my login system work with Firestore?"
+A: ChatGPT walked through how to use Firebase Auth (createUserWithEmailAndPassword and signInWithEmailAndPassword) and how to store/retrieve user data in Firestore using setDoc and getDoc.
+
+- ** 10 - Making Timers Persistent **
+Q: "How do I make the timer continue after refreshing the page?"
+A: ChatGPT suggested storing startTime in localStorage and calculating elapsed time with (Date.now() - startTime) / 1000. It also advised syncing rowStatus, timers, and startTimes across refreshes.
+
+- ** 11 - Is my timer persisting correctly? **
+Q: "Should I use elapsedSeconds or store the exact start time?"
+A: ChatGPT confirmed that storing exact startTime is better, then calculating the timer using real-time difference.
+
+- ** 12 - What are loose functions? **
+Q: "Do I have loose functions in my project?"
+A: ChatGPT reassured that the code is structured well but suggested grouping localStorage logic and repeated patterns into helpers or custom hooks.
+
+- ** 13 - How to clear localStorage from admin? **
+Q: "How do I add a button to clear localStorage?"
+A: ChatGPT showed how to create a Clear button in an admin panel using localStorage.clear() or selective key removal with confirmation.
+
+- ** 14 - Writing instructions on Home Page **
+Q: "Can you help write instructional text on my homepage?"
+A: ChatGPT added friendly onboarding text that explains registration, check-in, game modes, and encourages players. Also provided CSS for styling.
+
+- ** 15 - Updating Business Requirements **
+Q: "Can you help update my business requirements?"
+A: ChatGPT rewrote the business requirements to match the new check-in system, mode structure, and persistent timer logic with clear formatting.
+
+- ** 16 - Example Design Patterns in Code **
+Q: "Can you find examples of design patterns in my project?"
+A: ChatGPT identified Strategy, Memento, Observer, and Template patterns and explained how they apply using real code examples.
+
+- ** 17 - Format Design Patterns in a List **
+Q: "Can you rewrite the patterns in a formatted way?"
+A: ChatGPT listed the patterns as:
+
+Strategy Pattern
+
+Memento Pattern
+
+Observer Pattern
+
+Template Pattern
+With short explanations and code samples.
+
+- ** 18 - Add a new row and persist data **
+Q: "How do I update 'addNewRow' to persist in localStorage?"
+A: ChatGPT showed how to update the addNewRow function to also persist new rows, rowStatus, timers, and finalTimes to localStorage.
+
+- ** 19 - Make startTimes consistent with rowStatus **
+Q: "Can I write startTimes like rowStatus using setState?"
+A: ChatGPT rewrote the startTimes update using functional setStartTimes, mirroring the pattern used for setRowStatus.
+
+- ** 20 - Custom hooks to clean logic **
+Q: "Should I move repeated logic into hooks?"
+A: ChatGPT recommended creating custom hooks like usePersistentTimers() and useLineupStorage() to centralize logic.
+
+- ** 21 - Fixing async/await error **
+Q: "Why do I get 'await not allowed in non-async function'?"
+A: ChatGPT explained the need to declare the function with async if using await, and updated the function definition.
+
+- ** 22 - Styling with external CSS **
+Q: "How do I move inline styles to a CSS file?"
+A: ChatGPT showed how to refactor inline styles into a TimingSystem.css file and use classNames for cleaner structure.
+
+- ** 23 - Login as check-in system **
+Q: "I don't need sign-out. Is login enough?"
+A: ChatGPT confirmed that in a check-in model, logging in once is sufficient and explained how to track checked-in users without logout.
+
+- ** 24 - Firestore DB as Singleton **
+Q: "Is firestoreDB a singleton?"
+A: Yes. ChatGPT explained that the imported Firestore instance is a singleton pattern for consistent data access across components.
+
+- ** 25 - Instruction formatting example **
+Q: "Can you help make the homepage message friendly and clear?"
+A: ChatGPT rewrote the welcome message with headings, emoji, and CSS suggestions to engage players while explaining the rules.
 
 ## 12. Conclusion
 
