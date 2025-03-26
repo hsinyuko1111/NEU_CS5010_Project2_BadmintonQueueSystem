@@ -30,7 +30,7 @@ Welcome to the Badminton Queue System — a web-based app designed to fairly man
 ## Youtube Vedio Introduction
 
 - [📄 about this project](https://youtu.be/jpdqYXryx8Y) 
-- [📄 functional programming analysis](https://youtu.be/IQ3fMO47ef0)
+- [📄 functional programming analysis](https://youtu.be/iRjEEauNa40)
 
 
 ---
