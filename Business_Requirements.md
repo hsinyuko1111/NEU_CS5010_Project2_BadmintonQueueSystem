@@ -34,7 +34,7 @@ With the growing popularity of badminton at recreational clubs and professional 
 
 ### Player Management (Checkin and Registration)
 
-- Players can register as a user with name, email, and password. 
+- Players can register as a user with name, email, and password.
 - Players can check in with email and password to appear in the available player list.
 - No sign-out is required; the system treats login as a check-in event.
 - Registered and checked-in users are shown on the left panel in matching page.
@@ -46,12 +46,12 @@ With the growing popularity of badminton at recreational clubs and professional 
 
 ### Admin Tools
 
-- With the passcode entered, Admin can: 
-    - clear local storage to allows reset of the lining state if needed.
-    - check out users 
-    - delete users 
+- With the passcode entered, Admin can:
+  - clear local storage to allows reset of the lining state if needed.
+  - check out users
+  - delete users
 
-### Future-Proof Features 
+### Future-Proof Features
 
 - Firestore integration for syncing check-in status across devices
 - Admin dashboard to track total playtime and queue lengths
@@ -261,6 +261,7 @@ Register, Login, Join, Click, Select, Start, Restart, End, Move, Reset, Track, D
 ### Persona 1: Alex, the Casual Player
 
 **User Stories:**
+
 - "As a badminton player, I want to join a lineup with my group so that I can track when it's my turn to play."
 - "As a badminton player, I want to see my name in the lineup so that I can ensure my participation."
 - "As a badminton player, I want an intuitive UI so that I can easily navigate and join a game."
@@ -268,6 +269,7 @@ Register, Login, Join, Click, Select, Start, Restart, End, Move, Reset, Track, D
 ### Persona 2: Sam, the Court Organizer
 
 **User Stories:**
+
 - "As a court organizer, I want a quick start mode that instantly moves players back to the waiting list after their game so that I can maintain a smooth rotation."
 - "As a court organizer, I want an overview of the lineup so that I can monitor game progress efficiently."
 - "As a court organizer, I want the ability to remove inactive players from the lineup so that I can keep the system organized."
@@ -275,6 +277,7 @@ Register, Login, Join, Click, Select, Start, Restart, End, Move, Reset, Track, D
 ### Persona 3: Jordan, the Competitive Player
 
 **User Stories:**
+
 - "As a competitive player, I want to use timer mode to ensure fair playtime so that no one overuses the court."
 - "As a competitive player, I want my match history available so that I can analyze my performance."
 - "As a competitive player, I want notifications for when my turn is coming up so that I don't miss my match."
@@ -282,6 +285,7 @@ Register, Login, Join, Click, Select, Start, Restart, End, Move, Reset, Track, D
 ### Persona 4: Lisa, the Beginner Player
 
 **User Stories:**
+
 - "As a beginner player, I want a clear and simple way to join a game so that I don't feel overwhelmed when trying to participate."
 - "As a beginner player, I want a help section explaining the lineup process so that I can understand how to use the system."
 - "As a beginner player, I want to be able to undo my selection in case I click on the wrong lineup slot."
@@ -326,52 +330,52 @@ Each persona included age, background, engagement level, experience level, usage
 "As a beginner player, I want a help section explaining the lineup process so that I can understand how to use the system."
 
 - ** 6 - Firebase CLI Issue **
-Q: "Why does 'firebase init hosting' show command not found?"
-A: ChatGPT explained it's because Firebase CLI was not installed. Solution: run npm install -g firebase-tools and then verify using firebase --version.
+  Q: "Why does 'firebase init hosting' show command not found?"
+  A: ChatGPT explained it's because Firebase CLI was not installed. Solution: run npm install -g firebase-tools and then verify using firebase --version.
 
 - ** 7 - Is the main file equal to App? **
-Q: "Is my main file the same as App.jsx?"
-A: Yes. ChatGPT confirmed that routing defined directly in index.js is equivalent to using an App component, but recommended moving logic to an App.jsx file for clarity and state management.
+  Q: "Is my main file the same as App.jsx?"
+  A: Yes. ChatGPT confirmed that routing defined directly in index.js is equivalent to using an App component, but recommended moving logic to an App.jsx file for clarity and state management.
 
 - ** 8 - Using user state in App **
-Q: "I'm not using the user state in App.jsx — is that bad?"
-A: ChatGPT explained that user state should be used to control access and redirect based on login status. It suggested adding conditional rendering and explained how to manage check-in without sign-out.
+  Q: "I'm not using the user state in App.jsx — is that bad?"
+  A: ChatGPT explained that user state should be used to control access and redirect based on login status. It suggested adding conditional rendering and explained how to manage check-in without sign-out.
 
 - ** 9 - Login System with Firebase **
-Q: "How do I make my login system work with Firestore?"
-A: ChatGPT walked through how to use Firebase Auth (createUserWithEmailAndPassword and signInWithEmailAndPassword) and how to store/retrieve user data in Firestore using setDoc and getDoc.
+  Q: "How do I make my login system work with Firestore?"
+  A: ChatGPT walked through how to use Firebase Auth (createUserWithEmailAndPassword and signInWithEmailAndPassword) and how to store/retrieve user data in Firestore using setDoc and getDoc.
 
 - ** 10 - Making Timers Persistent **
-Q: "How do I make the timer continue after refreshing the page?"
-A: ChatGPT suggested storing startTime in localStorage and calculating elapsed time with (Date.now() - startTime) / 1000. It also advised syncing rowStatus, timers, and startTimes across refreshes.
+  Q: "How do I make the timer continue after refreshing the page?"
+  A: ChatGPT suggested storing startTime in localStorage and calculating elapsed time with (Date.now() - startTime) / 1000. It also advised syncing rowStatus, timers, and startTimes across refreshes.
 
 - ** 11 - Is my timer persisting correctly? **
-Q: "Should I use elapsedSeconds or store the exact start time?"
-A: ChatGPT confirmed that storing exact startTime is better, then calculating the timer using real-time difference.
+  Q: "Should I use elapsedSeconds or store the exact start time?"
+  A: ChatGPT confirmed that storing exact startTime is better, then calculating the timer using real-time difference.
 
 - ** 12 - What are loose functions? **
-Q: "Do I have loose functions in my project?"
-A: ChatGPT reassured that the code is structured well but suggested grouping localStorage logic and repeated patterns into helpers or custom hooks.
+  Q: "Do I have loose functions in my project?"
+  A: ChatGPT reassured that the code is structured well but suggested grouping localStorage logic and repeated patterns into helpers or custom hooks.
 
 - ** 13 - How to clear localStorage from admin? **
-Q: "How do I add a button to clear localStorage?"
-A: ChatGPT showed how to create a Clear button in an admin panel using localStorage.clear() or selective key removal with confirmation.
+  Q: "How do I add a button to clear localStorage?"
+  A: ChatGPT showed how to create a Clear button in an admin panel using localStorage.clear() or selective key removal with confirmation.
 
 - ** 14 - Writing instructions on Home Page **
-Q: "Can you help write instructional text on my homepage?"
-A: ChatGPT added friendly onboarding text that explains registration, check-in, game modes, and encourages players. Also provided CSS for styling.
+  Q: "Can you help write instructional text on my homepage?"
+  A: ChatGPT added friendly onboarding text that explains registration, check-in, game modes, and encourages players. Also provided CSS for styling.
 
 - ** 15 - Updating Business Requirements **
-Q: "Can you help update my business requirements?"
-A: ChatGPT rewrote the business requirements to match the new check-in system, mode structure, and persistent timer logic with clear formatting.
+  Q: "Can you help update my business requirements?"
+  A: ChatGPT rewrote the business requirements to match the new check-in system, mode structure, and persistent timer logic with clear formatting.
 
 - ** 16 - Example Design Patterns in Code **
-Q: "Can you find examples of design patterns in my project?"
-A: ChatGPT identified Strategy, Memento, Observer, and Template patterns and explained how they apply using real code examples.
+  Q: "Can you find examples of design patterns in my project?"
+  A: ChatGPT identified Strategy, Memento, Observer, and Template patterns and explained how they apply using real code examples.
 
 - ** 17 - Format Design Patterns in a List **
-Q: "Can you rewrite the patterns in a formatted way?"
-A: ChatGPT listed the patterns as:
+  Q: "Can you rewrite the patterns in a formatted way?"
+  A: ChatGPT listed the patterns as:
 
 Strategy Pattern
 
@@ -383,36 +387,36 @@ Template Pattern
 With short explanations and code samples.
 
 - ** 18 - Add a new row and persist data **
-Q: "How do I update 'addNewRow' to persist in localStorage?"
-A: ChatGPT showed how to update the addNewRow function to also persist new rows, rowStatus, timers, and finalTimes to localStorage.
+  Q: "How do I update 'addNewRow' to persist in localStorage?"
+  A: ChatGPT showed how to update the addNewRow function to also persist new rows, rowStatus, timers, and finalTimes to localStorage.
 
 - ** 19 - Make startTimes consistent with rowStatus **
-Q: "Can I write startTimes like rowStatus using setState?"
-A: ChatGPT rewrote the startTimes update using functional setStartTimes, mirroring the pattern used for setRowStatus.
+  Q: "Can I write startTimes like rowStatus using setState?"
+  A: ChatGPT rewrote the startTimes update using functional setStartTimes, mirroring the pattern used for setRowStatus.
 
 - ** 20 - Custom hooks to clean logic **
-Q: "Should I move repeated logic into hooks?"
-A: ChatGPT recommended creating custom hooks like usePersistentTimers() and useLineupStorage() to centralize logic.
+  Q: "Should I move repeated logic into hooks?"
+  A: ChatGPT recommended creating custom hooks like usePersistentTimers() and useLineupStorage() to centralize logic.
 
 - ** 21 - Fixing async/await error **
-Q: "Why do I get 'await not allowed in non-async function'?"
-A: ChatGPT explained the need to declare the function with async if using await, and updated the function definition.
+  Q: "Why do I get 'await not allowed in non-async function'?"
+  A: ChatGPT explained the need to declare the function with async if using await, and updated the function definition.
 
 - ** 22 - Styling with external CSS **
-Q: "How do I move inline styles to a CSS file?"
-A: ChatGPT showed how to refactor inline styles into a TimingSystem.css file and use classNames for cleaner structure.
+  Q: "How do I move inline styles to a CSS file?"
+  A: ChatGPT showed how to refactor inline styles into a TimingSystem.css file and use classNames for cleaner structure.
 
 - ** 23 - Login as check-in system **
-Q: "I don't need sign-out. Is login enough?"
-A: ChatGPT confirmed that in a check-in model, logging in once is sufficient and explained how to track checked-in users without logout.
+  Q: "I don't need sign-out. Is login enough?"
+  A: ChatGPT confirmed that in a check-in model, logging in once is sufficient and explained how to track checked-in users without logout.
 
 - ** 24 - Firestore DB as Singleton **
-Q: "Is firestoreDB a singleton?"
-A: Yes. ChatGPT explained that the imported Firestore instance is a singleton pattern for consistent data access across components.
+  Q: "Is firestoreDB a singleton?"
+  A: Yes. ChatGPT explained that the imported Firestore instance is a singleton pattern for consistent data access across components.
 
 - ** 25 - Instruction formatting example **
-Q: "Can you help make the homepage message friendly and clear?"
-A: ChatGPT rewrote the welcome message with headings, emoji, and CSS suggestions to engage players while explaining the rules.
+  Q: "Can you help make the homepage message friendly and clear?"
+  A: ChatGPT rewrote the welcome message with headings, emoji, and CSS suggestions to engage players while explaining the rules.
 
 ## 12. Conclusion
 

@@ -30,10 +30,13 @@ export default function AdminAuthGate({ children }) {
   };
 
   const startAutoLogout = () => {
-    setTimeout(() => {
-      handleAdminLogout();
-      alert("⏳ Session expired. Please re-enter the passcode.");
-    }, 5 * 60 * 1000);
+    setTimeout(
+      () => {
+        handleAdminLogout();
+        alert("⏳ Session expired. Please re-enter the passcode.");
+      },
+      5 * 60 * 1000,
+    );
   };
 
   if (!isAuthorized) {
