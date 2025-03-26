@@ -11,18 +11,28 @@ Welcome to the Badminton Queue System — a web-based app designed to fairly man
 - 📦 Data stored in Firestore + browser localStorage
 - 🔊 Audio alert when rounds end
 
-
 ## Business Requirement
+
 - [📄 View Business Requirements](./business_requirements.md)
 
 ## Mockup Interface
+
 - [📄 View Mockup](./mockup.pdf)
 
 ## Modules Diagram
+
 - [📄 View Diagram](./uml.png)
 
+## Functional Programming Analysis
+
+- [📄 View Analysis](./functional-programming-analysis.md)
+
 ## Youtube Vedio Introduction
-- [📄 click here](https://youtu.be/IQ3fMO47ef0)
+
+- [📄 about this project](https://youtu.be/IQ3fMO47ef0) 
+- [📄 functional programming analysis](https://youtu.be/IQ3fMO47ef0)
+
+
 ---
 
 ## 🚀 Getting Started
@@ -35,18 +45,21 @@ cd badminton-queue-system
 ```
 
 ### 2. Install dependencies
+
 ```
 bash
 npm install
 ```
 
 ### 3. Start the development server
+
 ```
 bash
 npm run dev
 ```
 
 ## 🧩 Modules Diagram (Relaxed Class-Like View)
+
 ```
 css
 🧠 App Root (main.jsx)
@@ -119,6 +132,7 @@ css
     └── getUsers() → All users from Firestore
 
 ```
+
 ## 🛠 Tech Stack
 
 - Frontend: React + Vite
@@ -130,12 +144,16 @@ css
 - Routing: React Router DOM
 
 ## 🔐 Admin Access
+
 To access the admin pages, use the default passcode:
+
 ```
 yaml
 Passcode: 1234
 ```
+
 Admin Pages:
+
 - /admin/delete — Delete users
 
 - /admin/checkout — Check out users manually
@@ -143,6 +161,7 @@ Admin Pages:
 - /admin/reset — Clear local app data
 
 ## 📁 Project Structure
+
 ```
 css
 📦 src
@@ -166,10 +185,7 @@ css
 ```
 
 ## 💬 Feedback
+
 I'd love to hear how it’s working for your group or any features you’d like to see!
 
 Made with ❤️ by 🥬🐥 Cindy 🏸
-
-
-
-

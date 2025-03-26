@@ -179,6 +179,7 @@ const emptyIndex = rows[rowIndex].findIndex((slot) => slot === null);
 ```
 
 ## Design Patterns
+- with the help of https://www.geeksforgeeks.org/software-design-patterns/
 
 ### 1. Strategy Pattern — Game Modes
 
