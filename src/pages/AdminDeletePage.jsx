@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import firestoreDB from "../db/fireStore";
 import BaseTemplate from "../components/BaseTemplate";
 import "../assets/style/Admin.css";
+import AdminAuthGate from "../components/AdminAuthGate";
 
 export default function AdminDeletePage() {
   const [users, setUsers] = useState([]);

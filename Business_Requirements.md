@@ -272,7 +272,9 @@ Register, Login, Join, Click, Select, Start, Restart, End, Move, Reset, Track, D
 
 - "As a court organizer, I want a quick start mode that instantly moves players back to the waiting list after their game so that I can maintain a smooth rotation."
 - "As a court organizer, I want an overview of the lineup so that I can monitor game progress efficiently."
-- "As a court organizer, I want the ability to remove inactive players from the lineup so that I can keep the system organized."
+- "As a court organizer, I want the ability to checkout inactive players from the lineup so that I can keep the system organized."
+- "As a court organizer, I want the ability to delete inactive players from the system"
+- "As a court organizer, I want to clean the pass history of the lineup system."
 
 ### Persona 3: Jordan, the Competitive Player
 

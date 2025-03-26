@@ -19,7 +19,7 @@ export default function AdminCheckoutPage() {
 
   const handleCheckOut = async (userId) => {
     await firestoreDB.checkOutUser(userId);
-    setUsers(users.filter((user) => user.id !== userId)); // ✅ Remove from UI
+    setUsers(users.filter((user) => user.id !== userId)); 
   };
 
   return (
