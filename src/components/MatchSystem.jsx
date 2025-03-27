@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
-import firestoreDB from "../db/fireStore";
+import firestoreDB from "../db/fireStore.js";
 const DEFAULT_AUDIO_URL =
   "https://codeskulptor-demos.commondatastorage.googleapis.com/descent/gotitem.mp3";
 

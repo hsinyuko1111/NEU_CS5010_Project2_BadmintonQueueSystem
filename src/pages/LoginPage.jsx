@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import "../assets/style/Auth.css";
 import BaseTemplate from "../components/BaseTemplate";
-import firestoreDB from "../db/fireStore";
+import firestoreDB from "../db/fireStore.js";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");

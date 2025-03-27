@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef, useCallback, useMemo } from "react";
 import "../assets/style/style.css";
-import firestoreDB from "../db/fireStore";
+import firestoreDB from "../db/fireStore.js";
 
 const DEFAULT_TIMER = 20 * 60; // 20 minutes in seconds
 const DEFAULT_AUDIO_URL =
