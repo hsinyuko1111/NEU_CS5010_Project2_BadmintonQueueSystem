@@ -1,7 +1,7 @@
 import React, { useState, Link } from "react";
 import "../assets/style/Auth.css";
 import BaseTemplate from "../components/BaseTemplate";
-import firestoreDB from "../db/fireStore.js";
+import firestoreDB from "../db/firestore.js";
 
 export default function RegisterPage() {
   const [formData, setFormData] = useState({

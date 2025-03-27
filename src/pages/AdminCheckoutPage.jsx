@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import firestoreDB from "../db/fireStore.js";
+import firestoreDB from "../db/firestore.js";
 import BaseTemplate from "../components/BaseTemplate";
 import "../assets/style/Admin.css";
 import AdminAuthGate from "../components/AdminAuthGate";
