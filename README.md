@@ -11,6 +11,10 @@ Welcome to the Badminton Queue System — a web-based app designed to fairly man
 - 📦 Data stored in Firestore + browser localStorage
 - 🔊 Audio alert when rounds end
 
+## Deployed Project
+
+- [🚀 Live App](https://badminton-lining-system.web.app/)
+
 ## Business Requirement
 
 - [📄 View Business Requirements](./business_requirements.md)
